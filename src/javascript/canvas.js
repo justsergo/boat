@@ -15,6 +15,10 @@ let leftPressed = false;
 let upPressed = false;
 let downPressed = false;
 
+const inRange = (number,min,max)=> {
+    return number>=min && number<=max;
+}
+
 
 img.onload = () => {   
     ctx.translate(boatWidth/2,boatHeight/2);
@@ -38,7 +42,6 @@ function keyDownHandler(e) {
     if(e.keyCode == 40) {
         downPressed = true;
     }   
-    console.log(ctx.getTransform()); 
 };
 
 function keyUpHandler(e) {    
@@ -54,24 +57,28 @@ function keyUpHandler(e) {
     if(e.keyCode == 40) {
         downPressed = false;
     }
+    console.log(ctx.getTransform()); 
 };
 
 const draw = () => {
     ctx.clearRect(-boatWidth, -boatHeight, canvas.width, canvas.height);
     if(rightPressed) {
-        ctx.rotate((Math.PI/180)*5)
+        ctx.rotate((Math.PI/180)*1)
     }
     if(leftPressed) {
-        ctx.rotate(-(Math.PI/180)*5)
+        ctx.rotate(-(Math.PI/180)*1)
     }     
     if(downPressed) {
-        const newY = boatY + 7;
-        boatY =  newY < saveX ? newY : saveX;
-        ctx.translate(0,-10)
+        const { f:y, b, c, e:x } = ctx.getTransform();
+        const newX = x - b*7;
+        const newY = y - c*7;
+        if( inRange(newX,0,saveX) && inRange(newY,0,saveY)) ctx.translate(0,-7)
     }
     if(upPressed) {
-        const { f } = ctx.getTransform();
-        if(f + 7 < saveY) ctx.translate(0,7)
+        const { f:y, b, c, e:x } = ctx.getTransform();
+        const newX = x + b*7;
+        const newY = y + c*7;
+        if( inRange(newX,0,saveX) && inRange(newY,0,saveY)) ctx.translate(0,7)
     }
   ctx.drawImage(img,41,5,boatWidth,boatHeight,-boatWidth/2,-boatHeight/2,boatWidth,boatHeight);
     window.requestAnimationFrame(draw);
