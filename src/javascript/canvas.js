@@ -7,6 +7,8 @@ const img = new Image();
 
 const saveX = canvas.width-boatWidth;
 const saveY = canvas.height-boatHeight / 2;
+const moveBoat = 7;
+const rotateBoat = (Math.PI/180)*1;
 
 let boatX = (saveX)/2;
 let boatY = (saveX)/2;
@@ -63,22 +65,24 @@ function keyUpHandler(e) {
 const draw = () => {
     ctx.clearRect(-boatWidth, -boatHeight, canvas.width, canvas.height);
     if(rightPressed) {
-        ctx.rotate((Math.PI/180)*1)
+        ctx.rotate(rotateBoat)
     }
     if(leftPressed) {
-        ctx.rotate(-(Math.PI/180)*1)
+        ctx.rotate(-rotateBoat)
     }     
     if(downPressed) {
-        const { f:y, b, c, e:x } = ctx.getTransform();
-        const newX = x - b*7;
-        const newY = y - c*7;
-        if( inRange(newX,0,saveX) && inRange(newY,0,saveY)) ctx.translate(0,-7)
+        const { f:y, b:rx, c:ry, e:x } = ctx.getTransform();
+        const newX = x - rx*moveBoat ;
+        const newY = Math.abs(y -(ry*ry+rx*rx) -7);
+        console.log('down',newY)
+        if( newY <= canvas.height && newY > 0 ) ctx.translate(0,-moveBoat)
     }
     if(upPressed) {
-        const { f:y, b, c, e:x } = ctx.getTransform();
-        const newX = x + b*7;
-        const newY = y + c*7;
-        if( inRange(newX,0,saveX) && inRange(newY,0,saveY)) ctx.translate(0,7)
+        const { f:y, b:rx, c:ry, e:x } = ctx.getTransform();
+        const newX = x +rx*moveBoat ;
+        const newY =  Math.abs(y +ry*ry+rx*rx+7);
+        console.log('up',newY)
+        if(newY <= canvas.height && newY > 0  ) ctx.translate(0,moveBoat)
     }
   ctx.drawImage(img,41,5,boatWidth,boatHeight,-boatWidth/2,-boatHeight/2,boatWidth,boatHeight);
     window.requestAnimationFrame(draw);
