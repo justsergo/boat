@@ -1,143 +1,104 @@
-class Boat {
-    constructor(width,height) {
-        this.height = height;
-        this.width = width;
-        this.x = width/2;
-        this.y = height/2;
-        this.cx = width/2+5;
-        this.cy = height/2+28;
-        this.step = 7;
-      }
+class InterfaceCanvas {
+    constructor (canvas) {
+        
+        this.window = window;
+        this.canvas = canvas;
+        this.ctx = canvas.getContext("2d");        
+        this.boatImg = new Image();
+        this.canonImg = new Image();
+        this.boat = new Boat(canvas.width, canvas.height, this.ctx);
 
-    moveVertical(isUp) {
-      this.y += isUp ? this.step : -this.step;
-      this.cy += isUp ? this.step : -this.step;
+        this.saveX = canvas.width-this.boat.boatWidth;
+        this.saveY = canvas.height-this.boat.boatHeight / 2;
+        this.stepBoat = 7;
+        this.rotateBoat = (Math.PI/180)*1;
+        this.maxWidth = canvas.width;
+        this.maxHeight = canvas.height;
+
+        this.boatX = (this.saveX)/2;
+        this.boatY = (this.saveX)/2;
+        this.rightPressed = false;
+        this.leftPressed = false;
+        this.upPressed = false;
+        this.downPressed = false;
+
+        this.boatImg.onload = () => {  
+            this.ctx.translate(this.boat.boatWidth/2,this.boat.boatHeight/2);
+            window.requestAnimationFrame(this.draw.bind(this));
+        };
+        this.boatImg.src = 'src/assets/PNG/Boats_color1/Boat_color1_4.png';
+        this.canonImg.src = 'src/assets/PNG/Cannon1_color1/Cannon1_color1_3.png';        
+         
+        document.addEventListener("keydown", this.keyDownHandler.bind(this), false);
+        document.addEventListener("keyup", this.keyUpHandler.bind(this), false);
+
     }
 
-    moveHorizontal(isRight) {
-      this.x += isRight ? this.step : -this.step;
-      this.cx += isRight ? this.step : -this.step;
-    }
+   
+    keyDownHandler(e) {    
+        if(e.keyCode == 37) {
+            this.leftPressed = true;
+        }
+        if(e.keyCode == 38) {
+            this.upPressed = true;
+        }
+        if(e.keyCode == 39) {
+            this.rightPressed = true;
+        }
+        if(e.keyCode == 40) {
+            this.downPressed = true;
+        }   
+    };
 
-    rotate(isRight) {
-        const angle = 180;
-        this.y += isRight ? -this.x*Math.sin(angle) + this.y*Math.cos(angle):  this.x*Math.sin(angle) + this.y*Math.cos(angle);
-        // this.cy += isRight ? this.cy*(Math.PI/180+1) : -this.step*(Math.PI/180+1);
-        this.x += isRight ?  this.x*Math.cos(angle) + this.y*Math.sin(angle):  this.x*Math.cos(angle) - this.y*Math.sin(angle);
-        // this.cx += isRight ? this.cx*(Math.PI/180+1) : -this.step*(Math.PI/180+1);
-    }
+    keyUpHandler(e) {    
+        if(e.keyCode == 37) {
+            this.leftPressed = false;this.ctx
+        }
+        if(e.keyCode == 38) {
+            this.upPressed = false;
+        }
+        if(e.keyCode == 39) {
+            this.rightPressed = false;
+        }
+        if(e.keyCode == 40) {
+            this.downPressed = false;
+        }
+        console.log(this.ctx.getTransform()); 
+    };
 
+    draw () {
+        this.ctx.clearRect(-this.boat.boatWidth/2, -this.boat.boatHeight/2, this.canvas.width, this.canvas.height);
+        if(this.rightPressed) {
+            const x = this.boat.x + (this.boat.width / 2);
+            const y = this.boat.y + (this.boat.height / 2) ;
+            const direction = (Math.atan2(this.boat.y,this.boat.x) * 180) / Math.PI;
+            // this.ctx.save();
+            // this.ctx.translate(this.canvas.width/2, this.canvas.height/2);
+            this.ctx.rotate(( Math.PI / 180)*3);
+        
+
+        }
+        if(this.leftPressed) {
+            const x =  this.boat.x + ( this.boat.width / 2);
+            const y =  this.boat.y + ( this.boat.height / 2) ;
+            const direction = (Math.atan2( this.boat.y, this.boat.x) * 180) / Math.PI;
+            // this.ctx.save();
+            // this.ctx.translate(this.canvas.width/2, this.canvas.height/2);
+            this.ctx.rotate(-(Math.PI/ 180)*3);
+        
+        }     
+        if(this.downPressed) {
+            // this.boat.moveVertical();
+            this.ctx.translate(0, -7);
+        }
+        if(this.upPressed) {
+            // this.boat.moveVertical(true);
+            this.ctx.translate(0, 7);
+        }
+        this.ctx.drawImage(this.boatImg, 41,5, this.boat.boatWidth, this.boat.boatHeight,- this.boat.boatWidth/2,- this.boat.boatHeight/2, this.boat.boatWidth, this.boat.boatHeight);
+        this.ctx.drawImage(this.canonImg, 41,-18, this.boat.boatWidth, this.boat.boatHeight,- this.boat.boatWidth/2,- this.boat.boatHeight/2, this.boat.boatWidth, this.boat.boatHeight);
+        // this.ctx.restore();
+        window.requestAnimationFrame(this.draw.bind(this));
+    };   
 
 }
-
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-const boatWidth = 43;
-const boatHeight = 118;
-const boatImg = new Image();
-const canonImg = new Image();
-boatImg.onload = () => {   
-    ctx.translate(boat.x/4,boat.y/4)    
-    window.requestAnimationFrame(draw);
-};
-boatImg.src = 'src/assets/PNG/Boats_color1/Boat_color1_4.png';
-canonImg.src = 'src/assets/PNG/Cannon1_color1/Cannon1_color1_3.png';
-
-
-
-
-const boat = new Boat(canvas.width, canvas.height);
-console.log(boat)
-const saveX = canvas.width-boatWidth;
-const saveY = canvas.height-boatHeight / 2;
-const stepBoat = 7;
-const rotateBoat = (Math.PI/180)*1;
-const maxWidth = canvas.width;
-const maxHeight = canvas.height;
-
-let boatX = (saveX)/2;
-let boatY = (saveX)/2;
-let rightPressed = false;
-let leftPressed = false;
-let upPressed = false;
-let downPressed = false;
- 
-document.addEventListener("keydown", keyDownHandler, false);
-document.addEventListener("keyup", keyUpHandler, false);
-
-function keyDownHandler(e) {    
-    if(e.keyCode == 37) {
-        leftPressed = true;
-    }
-    if(e.keyCode == 38) {
-        upPressed = true;
-    }
-    if(e.keyCode == 39) {
-        rightPressed = true;
-    }
-    if(e.keyCode == 40) {
-        downPressed = true;
-    }   
-};
-
-function keyUpHandler(e) {    
-    if(e.keyCode == 37) {
-        leftPressed = false;
-    }
-    if(e.keyCode == 38) {
-        upPressed = false;
-    }
-    if(e.keyCode == 39) {
-        rightPressed = false;
-    }
-    if(e.keyCode == 40) {
-        downPressed = false;
-    }
-    console.log(ctx.getTransform()); 
-};
-
-const draw = () => {
-    ctx.clearRect(-boatWidth, -boatHeight, canvas.width, canvas.height);
-    // let moveBoat = stepBoat;
-    if(rightPressed) {
-        // boat.rotate(true)
-        const x = boat.x + (boat.width / 2);
-        const y = boat.y + (boat.height / 2) ;
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate((boat.x * Math.PI) / 180);
-
-    }
-    if(leftPressed) {
-        // boat.rotate()
-        ctx.rotate(-rotateBoat)
-    }     
-    if(downPressed) {
-        boat.moveVertical()
-        // const { f:y, b:rx, c:ry, e:x } = ctx.getTransform();
-        // const newX = x - rx*stepBoat ;
-        // const newY = Math.abs(y -(ry*ry+rx*rx) -7);
-        // console.log('down',newY)
-        // if(newY + stepBoat > maxHeight) moveBoat = maxHeight - y;
-        // if(newY + stepBoat < 0) moveBoat = y;        
-
-        // ctx.translate(0,-moveBoat)
-    }
-    if(upPressed) {
-        boat.moveVertical(true)
-        // const { f:y, b:rx, c:ry, e:x } = ctx.getTransform();
-        // const newX = x +rx*stepBoat ;
-        // const newY =  Math.abs(y +ry*ry+rx*rx+7);
-        // console.log('up',newY)
-
-        // if(newY + stepBoat > maxHeight) moveBoat = maxHeight - y;
-        // if(newY + stepBoat < 0) moveBoat = y;
-        
-        // ctx.translate(0,moveBoat)
-    }
-    ctx.drawImage(boatImg,boat.x,boat.y,128,128);
-    ctx.drawImage(canonImg,boat.cx,boat.cy,118,118);
-    window.requestAnimationFrame(draw);
-};   
-
-
