@@ -5,6 +5,7 @@ if (heads && heads.length > 0) {
   const requireScripts = [
     "canvas.js",
     "boat.js",
+    "canon.js",
   ];
 
   for (let i = 0; i < requireScripts.length; i++) {
