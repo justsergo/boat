@@ -11,6 +11,8 @@ class Boat {
     this.y = canvas.height/2 - this.boatHeight/2;
 
     this.boatImg.src = './src/assets/PNG/Boats_color1/Boat_color1_4.png';
+
+    console.log(document.body.clientWidth*0.95)
   }
 
   drawBoat() {
