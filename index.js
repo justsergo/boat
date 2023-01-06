@@ -26,13 +26,9 @@ window.onload = () => {
         const canvas = document.createElement('canvas');
         const width = document.body.clientWidth*0.95;
         const height = document.body.clientHeight*0.95;
-        canvas.style.width = `${width}px`;
-        canvas.style.height =`${height}px`;
-        // canvas.style.margin = ' 0 2.5%'
-        // canvas.width = 800;
-        // canvas.width = '100vw';
-        // canvas.height = '100vh';
-        // canvas.height = 800;
+        // canvas.width = innerWidth;
+        canvas.width = width;
+        canvas.height = height;
         if (canvas.getContext) {
             app.appendChild(canvas);
             new InterfaceCanvas(canvas);

@@ -56,7 +56,7 @@ class InterfaceCanvas {
     };
 
     draw () {
-        this.ctx.clearRect(-this.boat.boatWidth/2, -this.boat.boatHeight/2, this.canvas.width, this.canvas.height);
+        this.ctx.clearRect(-this.boat.boatWidth, -this.boat.boatHeight, this.canvas.width, this.canvas.height);
         const { a:sx, b:sy, c:rx, d:ry, e:x, f:y} = this.ctx.getTransform();
         // let step = 7;
         const newX = rx > 0 ?  x + 64 : x - 64;
@@ -85,7 +85,7 @@ class InterfaceCanvas {
             this.boat.moveBoat('up')
         }
         this.boat.drawBoat();
-        // this.canon.drawCanon();
+        this.canon.drawCanon();
         window.requestAnimationFrame(this.draw.bind(this));
     };   
 }
