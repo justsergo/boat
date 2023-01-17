@@ -1,89 +1,99 @@
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+class InterfaceCanvas {
+    constructor (canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext("2d");        
+       
+        this.boat = new Boat(canvas);
+        this.canon = new Canon(canvas);
 
-const boatWidth = 43;
-const boatHeight = 118;
-const img = new Image();
+        this.rightPressed = false;
+        this.leftPressed = false;
+        this.upPressed = false;
+        this.downPressed = false;
 
-const saveX = canvas.width-boatWidth;
-const saveY = canvas.height-boatHeight / 2;
+        this.boat.boatImg.onload = () => {  
+            this.ctx.translate(
+                this.canvas.width/2 - this.boat.boatWidth/2,
+                this.canvas.height/2 - this.boat.boatHeight/2);
+            window.requestAnimationFrame(this.draw.bind(this));
+        };       
+         
+        document.addEventListener("keydown", this.keyDownHandler.bind(this), false);
+        document.addEventListener("keyup", this.keyUpHandler.bind(this), false);
 
-let boatX = (saveX)/2;
-let boatY = (saveX)/2;
-let rightPressed = false;
-let leftPressed = false;
-let upPressed = false;
-let downPressed = false;
+    }
 
-const inRange = (number,min,max)=> {
-    return number>=min && number<=max;
+   
+    keyDownHandler(e) {    
+        if(e.keyCode == 37) {
+            this.leftPressed = true;
+        }
+        if(e.keyCode == 38) {
+            this.upPressed = true;
+        }
+        if(e.keyCode == 39) {
+            this.rightPressed = true;
+        }
+        if(e.keyCode == 40) {
+            this.downPressed = true;
+        }   
+    };
+
+    keyUpHandler(e) {    
+        if(e.keyCode == 37) {
+            this.leftPressed = false;
+        }
+        if(e.keyCode == 38) {
+            this.upPressed = false;
+        }
+        if(e.keyCode == 39) {
+            this.rightPressed = false;
+        }
+        if(e.keyCode == 40) {
+            this.downPressed = false;
+        }
+        console.log(this.ctx.getTransform()); 
+    };
+
+    draw () {
+        this.ctx.clearRect(-this.boat.boatWidth, -this.boat.boatHeight, this.canvas.width, this.canvas.height);
+        const { a:sx, b:sy, c:rx, d:ry, e:x, f:y} = this.ctx.getTransform();
+        // let step = 7;
+        const newX = rx > 0 ?  x + 64 : x - 64;
+        const newY = ry > 0 ? y +64: y -64;
+        const nextX = newX + 7;
+        const nextY = newY + 7;
+        // nextX >= this.canvas.width ? step = this.canvas.width : step = 7;
+        // nextX <= 0 ? step = 0: step = 7;
+        const condition = nextX> this.canvas.width || nextX <=0 || nextY > this.canvas.height || nextY <=0 
+        if(this.rightPressed) {           
+            this.boat.rotateBoat('clockwise');
+        }
+        if(this.leftPressed) {       
+            this.boat.rotateBoat();         
+        }     
+        // if(this.downPressed) {               
+        //     if (condition ) {
+        //         this.boat.moveBoat('stop')
+        //     }     
+        //     this.boat.moveBoat()
+        // }
+        if(this.upPressed) {                 
+            if (condition) {
+                this.boat.moveBoat('stop')
+            }          
+            this.boat.moveBoat('up')
+        }
+        this.boat.drawBoat();
+        this.canon.drawCanon();
+        window.requestAnimationFrame(this.draw.bind(this));
+    };   
 }
 
 
-img.onload = () => {   
-    ctx.translate(boatWidth/2,boatHeight/2);
-    ctx.drawImage(img,41,5,boatWidth,boatHeight,-boatWidth/2,-boatHeight/2,boatWidth,boatHeight); 
-    console.log(ctx.getTransform());
-};
-    
-document.addEventListener("keydown", keyDownHandler, false);
-document.addEventListener("keyup", keyUpHandler, false);
-
-function keyDownHandler(e) {    
-    if(e.keyCode == 37) {
-        leftPressed = true;
-    }
-    if(e.keyCode == 38) {
-        upPressed = true;
-    }
-    if(e.keyCode == 39) {
-        rightPressed = true;
-    }
-    if(e.keyCode == 40) {
-        downPressed = true;
-    }   
-};
-
-function keyUpHandler(e) {    
-    if(e.keyCode == 37) {
-        leftPressed = false;
-    }
-    if(e.keyCode == 38) {
-        upPressed = false;
-    }
-    if(e.keyCode == 39) {
-        rightPressed = false;
-    }
-    if(e.keyCode == 40) {
-        downPressed = false;
-    }
-    console.log(ctx.getTransform()); 
-};
-
-const draw = () => {
-    ctx.clearRect(-boatWidth, -boatHeight, canvas.width, canvas.height);
-    if(rightPressed) {
-        ctx.rotate((Math.PI/180)*1)
-    }
-    if(leftPressed) {
-        ctx.rotate(-(Math.PI/180)*1)
-    }     
-    if(downPressed) {
-        const { f:y, b, c, e:x } = ctx.getTransform();
-        const newX = x - b*7;
-        const newY = y - c*7;
-        if( inRange(newX,0,saveX) && inRange(newY,0,saveY)) ctx.translate(0,-7)
-    }
-    if(upPressed) {
-        const { f:y, b, c, e:x } = ctx.getTransform();
-        const newX = x + b*7;
-        const newY = y + c*7;
-        if( inRange(newX,0,saveX) && inRange(newY,0,saveY)) ctx.translate(0,7)
-    }
-  ctx.drawImage(img,41,5,boatWidth,boatHeight,-boatWidth/2,-boatHeight/2,boatWidth,boatHeight);
-    window.requestAnimationFrame(draw);
-};   
-
-window.requestAnimationFrame(draw);
-
-img.src = 'src/assets/PNG/Boats_color1/Boat_color1_4.png';
+// var a = matrix.a;	// scale x размер
+// var b = matrix.b;	// shear y сдвиг
+// var c = matrix.c;	// shear x
+// var d = matrix.d;	// scale y
+// var e = matrix.e;	// translate x
+// var f = matrix.f;	// translate y
